@@ -16,3 +16,5 @@ export const searchIssuesSchema = z.object({
       "Search query to find issues in this repository. Supports GitHub search syntax such as label:bug or is:open, but not repo:, org:, or user:."
     ),
 });
+
+export type SearchIssuesInput = z.infer<typeof searchIssuesSchema>;

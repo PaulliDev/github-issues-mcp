@@ -22,5 +22,5 @@ export function loadConfiguration(): ServerConfiguration {
     );
   }
 
-  return { githubToken, owner, repository };
+  return { githubToken: githubToken, owner: owner, repository: repository };
 }

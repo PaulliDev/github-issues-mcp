@@ -7,3 +7,5 @@ export const listIssuesSchema = z.object({
     .default("open")
     .describe("Filter issues by state. Defaults to open issues."),
 });
+
+export type ListIssuesInput = z.infer<typeof listIssuesSchema>;

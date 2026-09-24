@@ -12,3 +12,5 @@ export const addCommentSchema = z.object({
     .max(65536)
     .describe("The comment body. Supports markdown."),
 });
+
+export type AddCommentInput = z.infer<typeof addCommentSchema>;

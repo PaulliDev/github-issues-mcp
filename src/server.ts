@@ -3,10 +3,10 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import type { GitHubClient } from "./github-client.js";
 import { sanitizeToolOutput } from "./security/sanitize-tool-output.js";
-import { addCommentSchema } from "./tools/add-comment.js";
-import { createIssueSchema } from "./tools/create-issue.js";
-import { listIssuesSchema } from "./tools/list-issues.js";
-import { searchIssuesSchema } from "./tools/search-issues.js";
+import { addCommentSchema, type AddCommentInput } from "./tools/add-comment.js";
+import { createIssueSchema, type CreateIssueInput } from "./tools/create-issue.js";
+import { listIssuesSchema, type ListIssuesInput } from "./tools/list-issues.js";
+import { searchIssuesSchema, type SearchIssuesInput } from "./tools/search-issues.js";
 
 const SERVER_NAME = "github-issues";
 const RECENT_ISSUES_LIMIT = 10;
@@ -43,7 +43,7 @@ function registerTools(server: McpServer, githubClient: GitHubClient): void {
         "List issues in the GitHub repository, most recently updated first. Returns issue number, title, state, author, and labels.",
       inputSchema: listIssuesSchema.shape,
     },
-    async ({ state }) => toTextResult(await githubClient.listIssues(state))
+    async (input: ListIssuesInput) => toTextResult(await githubClient.listIssues(input.state))
   );
 
   server.registerTool(
@@ -52,8 +52,8 @@ function registerTools(server: McpServer, githubClient: GitHubClient): void {
       description: "Create a new issue in the GitHub repository.",
       inputSchema: createIssueSchema.shape,
     },
-    async ({ title, body, labels }) =>
-      toTextResult(await githubClient.createIssue(title, body, labels))
+    async (input: CreateIssueInput) =>
+      toTextResult(await githubClient.createIssue(input.title, input.body, input.labels))
   );
 
   server.registerTool(
@@ -62,8 +62,8 @@ function registerTools(server: McpServer, githubClient: GitHubClient): void {
       description: "Add a comment to an existing issue.",
       inputSchema: addCommentSchema.shape,
     },
-    async ({ issueNumber, body }) =>
-      toTextResult(await githubClient.addComment(issueNumber, body))
+    async (input: AddCommentInput) =>
+      toTextResult(await githubClient.addComment(input.issueNumber, input.body))
   );
 
   server.registerTool(
@@ -73,7 +73,7 @@ function registerTools(server: McpServer, githubClient: GitHubClient): void {
         "Search for issues in this repository using GitHub search syntax (for example label:bug is:open).",
       inputSchema: searchIssuesSchema.shape,
     },
-    async ({ query }) => toTextResult(await githubClient.searchIssues(query))
+    async (input: SearchIssuesInput) => toTextResult(await githubClient.searchIssues(input.query))
   );
 }
 

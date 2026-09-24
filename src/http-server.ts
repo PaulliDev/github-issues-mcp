@@ -35,7 +35,7 @@ function loadPort(): number {
 }
 
 function sendJsonRpcError(response: Response, status: number, code: number, message: string): void {
-  response.status(status).json({ jsonrpc: "2.0", error: { code, message }, id: null });
+  response.status(status).json({ jsonrpc: "2.0", error: { code: code, message: message }, id: null });
 }
 
 async function handleMcpRequest(

@@ -41,7 +41,7 @@ export class GitHubClient {
   // Returns up to 30 issues, most recently updated first.
   public async listIssues(state: IssueStateFilter): Promise<GitHubIssue[]> {
     const url = this.buildUrl(`${this.repositoryPath}/issues`, {
-      state,
+      state: state,
       sort: "updated",
       direction: "desc",
       per_page: String(LIST_ISSUES_PAGE_SIZE),
@@ -59,7 +59,7 @@ export class GitHubClient {
     const url = this.buildUrl(`${this.repositoryPath}/issues`);
     const rawIssue = await this.request<GitHubApiIssue>(url, {
       method: "POST",
-      body: JSON.stringify({ title, body, labels }),
+      body: JSON.stringify({ title: title, body: body, labels: labels }),
     });
 
     return mapToGitHubIssue(rawIssue);
@@ -70,7 +70,7 @@ export class GitHubClient {
     const url = this.buildUrl(`${this.repositoryPath}/issues/${issueNumber}/comments`);
     const rawComment = await this.request<GitHubApiComment>(url, {
       method: "POST",
-      body: JSON.stringify({ body }),
+      body: JSON.stringify({ body: body }),
     });
 
     return mapToGitHubComment(rawComment);
