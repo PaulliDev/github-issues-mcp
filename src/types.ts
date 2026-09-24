@@ -1,9 +1,17 @@
+// The states an issue can be in, and the filters list_issues accepts.
+// Defined once here and reused by the Zod schema and the GitHub client.
+export const ISSUE_STATE_FILTERS = ["open", "closed", "all"] as const;
+
+export type IssueStateFilter = (typeof ISSUE_STATE_FILTERS)[number];
+
+export type IssueState = Exclude<IssueStateFilter, "all">;
+
 // An issue as our tools return it to the AI: only the fields it needs, in camelCase.
 export interface GitHubIssue {
   number: number;
   title: string;
   body: string | null;
-  state: "open" | "closed";
+  state: IssueState;
   author: string;
   labels: string[];
   createdAt: string;
@@ -43,7 +51,7 @@ export interface GitHubApiIssue {
   number: number;
   title: string;
   body: string | null;
-  state: "open" | "closed";
+  state: IssueState;
   user: GitHubApiUser;
   labels: GitHubApiLabel[];
   created_at: string;

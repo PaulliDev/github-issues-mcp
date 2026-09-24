@@ -1,4 +1,6 @@
+import { readFileSync } from "node:fs";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import type { GitHubClient } from "./github-client.js";
 import { sanitizeToolOutput } from "./security/sanitize-tool-output.js";
 import { addCommentSchema } from "./tools/add-comment.js";
@@ -6,12 +8,28 @@ import { createIssueSchema } from "./tools/create-issue.js";
 import { listIssuesSchema } from "./tools/list-issues.js";
 import { searchIssuesSchema } from "./tools/search-issues.js";
 
-interface TextToolResult {
-  [key: string]: unknown;
-  content: Array<{ type: "text"; text: string }>;
+const SERVER_NAME = "github-issues";
+const RECENT_ISSUES_LIMIT = 10;
+
+// Reads the version from package.json so the server never reports a stale one.
+function readPackageVersion(): string {
+  const packageJsonUrl = new URL("../package.json", import.meta.url);
+  const packageJson: unknown = JSON.parse(readFileSync(packageJsonUrl, "utf-8"));
+
+  if (
+    typeof packageJson === "object" &&
+    packageJson !== null &&
+    "version" in packageJson &&
+    typeof packageJson.version === "string"
+  ) {
+    return packageJson.version;
+  }
+
+  throw new Error("package.json is missing a version");
 }
 
-function toTextResult(data: unknown): TextToolResult {
+// Every tool returns its data as pretty-printed JSON text, filtered for prompt injection.
+function toTextResult(data: unknown): CallToolResult {
   return {
     content: [{ type: "text", text: sanitizeToolOutput(JSON.stringify(data, null, 2)) }],
   };
@@ -51,7 +69,8 @@ function registerTools(server: McpServer, githubClient: GitHubClient): void {
   server.registerTool(
     "search_issues",
     {
-      description: "Search for issues using GitHub search syntax.",
+      description:
+        "Search for issues in this repository using GitHub search syntax (for example label:bug is:open).",
       inputSchema: searchIssuesSchema.shape,
     },
     async ({ query }) => toTextResult(await githubClient.searchIssues(query))
@@ -77,10 +96,13 @@ function registerResources(server: McpServer, githubClient: GitHubClient): void 
   server.registerResource(
     "recent-issues",
     "repo://issues/recent",
-    { description: "The 10 most recently updated open issues", mimeType: "application/json" },
+    {
+      description: `The ${RECENT_ISSUES_LIMIT} most recently updated open issues`,
+      mimeType: "application/json",
+    },
     async (uri: URL) => {
       const issues = await githubClient.listIssues("open");
-      const recentIssues = issues.slice(0, 10);
+      const recentIssues = issues.slice(0, RECENT_ISSUES_LIMIT);
 
       return {
         contents: [
@@ -97,8 +119,8 @@ function registerResources(server: McpServer, githubClient: GitHubClient): void 
 
 export function createServer(githubClient: GitHubClient): McpServer {
   const server = new McpServer({
-    name: "github-issues",
-    version: "1.0.0",
+    name: SERVER_NAME,
+    version: readPackageVersion(),
   });
 
   registerTools(server, githubClient);

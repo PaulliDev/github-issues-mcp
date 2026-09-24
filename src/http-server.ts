@@ -8,6 +8,8 @@ import { createServer } from "./server.js";
 
 const RATE_LIMIT_WINDOW_MILLISECONDS = 60_000;
 const RATE_LIMIT_MAX_REQUESTS = 60;
+const DEFAULT_PORT = 3001;
+const MAXIMUM_PORT = 65535;
 
 function loadAuthenticationToken(): string {
   const authenticationToken = process.env.MCP_AUTH_TOKEN;
@@ -17,6 +19,19 @@ function loadAuthenticationToken(): string {
   }
 
   return authenticationToken;
+}
+
+// Reads PORT from the environment. Rejects values like "abc" or "70000" instead of
+// silently starting on NaN or an invalid port.
+function loadPort(): number {
+  const rawPort = process.env.PORT ?? String(DEFAULT_PORT);
+  const port = Number(rawPort);
+
+  if (!Number.isInteger(port) || port < 1 || port > MAXIMUM_PORT) {
+    throw new Error(`Invalid PORT: "${rawPort}". Use a whole number between 1 and ${MAXIMUM_PORT}.`);
+  }
+
+  return port;
 }
 
 function sendJsonRpcError(response: Response, status: number, code: number, message: string): void {
@@ -56,7 +71,7 @@ async function startHttpServer(): Promise<void> {
   const authenticationToken = loadAuthenticationToken();
   const githubClient = new GitHubClient(configuration);
   const application = express();
-  const port = parseInt(process.env.PORT ?? "3001", 10);
+  const port = loadPort();
 
   application.use(express.json());
   application.use(

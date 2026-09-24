@@ -15,5 +15,3 @@ export const createIssueSchema = z.object({
     .default([])
     .describe("Labels to apply to the issue."),
 });
-
-export type CreateIssueInput = z.infer<typeof createIssueSchema>;
