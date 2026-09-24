@@ -1,3 +1,4 @@
+// An issue as our tools return it to the AI: only the fields it needs, in camelCase.
 export interface GitHubIssue {
   number: number;
   title: string;
@@ -9,6 +10,7 @@ export interface GitHubIssue {
   updatedAt: string;
 }
 
+// A comment as the add_comment tool returns it to the AI.
 export interface GitHubComment {
   id: number;
   body: string;
@@ -16,6 +18,7 @@ export interface GitHubComment {
   createdAt: string;
 }
 
+// Settings loaded from environment variables and passed to the GitHub client.
 export interface ServerConfiguration {
   githubToken: string;
   owner: string;
@@ -24,14 +27,18 @@ export interface ServerConfiguration {
 
 // The subset of GitHub REST API response fields this server reads.
 
+// The author of an issue or comment, as GitHub returns it.
 interface GitHubApiUser {
   login: string;
 }
 
+// A label attached to an issue, as GitHub returns it.
 interface GitHubApiLabel {
   name: string;
 }
 
+// A raw issue from GitHub. The client maps it to GitHubIssue.
+// Pull requests come back from the same endpoint and carry a `pull_request` field.
 export interface GitHubApiIssue {
   number: number;
   title: string;
@@ -44,6 +51,7 @@ export interface GitHubApiIssue {
   pull_request?: unknown;
 }
 
+// A raw comment from GitHub. The client maps it to GitHubComment.
 export interface GitHubApiComment {
   id: number;
   body: string;
@@ -51,10 +59,12 @@ export interface GitHubApiComment {
   created_at: string;
 }
 
+// The response of GitHub's search endpoint, used by search_issues.
 export interface GitHubApiSearchResult {
   items: GitHubApiIssue[];
 }
 
+// The README endpoint response. `content` is base64 encoded.
 export interface GitHubApiReadme {
   content: string;
 }
