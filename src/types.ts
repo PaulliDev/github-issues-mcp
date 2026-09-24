@@ -33,7 +33,7 @@ interface GitHubApiUser {
 }
 
 // A label attached to an issue, as GitHub returns it.
-interface GitHubApiLabel {
+export interface GitHubApiLabel {
   name: string;
 }
 
