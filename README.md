@@ -1,11 +1,10 @@
+> **This repository is the companion code for the article [Building a Custom MCP Server in TypeScript](https://snippets.ltd/blog/building-custom-mcp-server-in-typescript)**
+> on the Snippets Ltd blog. Read the article for the step-by-step explanation: https://snippets.ltd/blog/building-custom-mcp-server-in-typescript
+
 # GitHub Issues MCP Server
 
 A Model Context Protocol (MCP) server in TypeScript that lets Claude, Cursor, or any MCP client
 list, create, search, and comment on GitHub issues.
-
-This is the companion code for the Snippets Ltd tutorial
-**[Building a Custom MCP Server in TypeScript](https://snippets.ltd/blog/building-custom-mcp-server-in-typescript)**.
-Read the article for the step-by-step explanation.
 
 ## What it exposes
 
